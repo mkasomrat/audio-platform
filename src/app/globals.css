@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 244 246 250; --surface: 255 255 255; --ink: 16 22 42; --muted: 98 108 130; --line: 217 223 234;
+  --brand: 15 118 110; --brand-ink: 255 255 255; --live: 220 38 38; --danger: 185 28 28;
+}
+.dark {
+  --bg: 11 15 30; --surface: 19 25 46; --ink: 232 237 247; --muted: 148 160 184; --line: 41 50 78;
+  --brand: 45 212 191; --brand-ink: 6 30 28; --live: 248 113 113; --danger: 252 165 165;
+}
+body { @apply bg-bg text-ink font-sans antialiased; }
+h1, h2, h3 { @apply font-display tracking-tight; }
+:focus-visible { outline: 2px solid rgb(var(--brand)); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation: none !important; transition: none !important; } }
+@keyframes eq { 0%,100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+.eq-bar { transform-origin: bottom; animation: eq 1.1s ease-in-out infinite; }

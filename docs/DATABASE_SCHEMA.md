@@ -1,0 +1,5 @@
+# Database schema
+Identity: profiles, app_roles, user_roles. Broadcasts: broadcast_categories, broadcasts, broadcast_hosts, speaker_requests, broadcast_participants. Recordings/library: recordings, audio_categories, audio_tags, audio_library, audio_library_tags. Personal: audio_playlists, playlist_items, bookmarks, listening_history, user_preferences. System: system_settings, audit_logs.
+Phase 2 columns already exist: broadcasts.livekit_room_name, recordings.egress_id, speaker_requests, broadcast_participants. Phase 3 archive columns exist on recordings. Public read: published broadcasts and library, categories, hosts, public settings. Everything else is owner- or admin-only. Live writes in Phase 2 use the server with the service-role key.
+
+Phase 2 additions (0003): rate_limits, rate_limit_hit(), can_moderate_broadcast(), recording format/bitrate/error columns. Phase 3 (0004): audio_library.stream_url/duration/size, Dropbox check and test columns on recordings, increment_play_count(), extra indexes, tightened read policies for broadcast_hosts and audio_library_tags.
