@@ -12,9 +12,9 @@ export default async function MyBroadcasts() {
   const { data: hostRows } = await db.from("broadcast_hosts").select("broadcast_id").eq("user_id", user.id);
   const ids = (hostRows ?? []).map((h) => h.broadcast_id);
   const isAdmin = roles.includes("admin") || roles.includes("super_admin");
-  let q = db.from("broadcasts").select("id,title,status,scheduled_at").order("created_at", { ascending: false }).limit(100);
+  let q = db.from("broadcasts").select("id,title,status,scheduled_at");
   if (!isAdmin) q = q.or(`created_by.eq.${user.id}${ids.length ? `,id.in.(${ids.join(",")})` : ""}`);
-  const { data } = await q;
+  const { data } = await q.order("created_at", { ascending: false }).limit(100);
   return (
     <>
       <div className="mb-4 flex items-center justify-between"><h1 className="text-3xl font-bold">My broadcasts</h1><Button href="/studio/broadcasts/new">New broadcast</Button></div>

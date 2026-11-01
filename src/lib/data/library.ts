@@ -35,12 +35,12 @@ export async function searchLibrary(o: Query): Promise<Lib<{ items: AudioItem[];
     const s = (o.q ?? "").replace(/[%_,()\\]/g, " ").trim().slice(0, 80);
     if (s) q = q.or(`title.ilike.%${s}%,description.ilike.%${s}%`);
     const sort = o.sort ?? "new";
-    q = sort === "old" ? q.order("published_at", { ascending: true })
+    const ordered = sort === "old" ? q.order("published_at", { ascending: true })
       : sort === "popular" ? q.order("play_count", { ascending: false }).order("published_at", { ascending: false })
       : sort === "title" ? q.order("title", { ascending: true })
       : q.order("published_at", { ascending: false });
     const page = Math.max(1, o.page ?? 1), from = (page - 1) * PAGE_SIZE;
-    const { data, count, error } = await q.range(from, from + PAGE_SIZE - 1);
+    const { data, count, error } = await ordered.range(from, from + PAGE_SIZE - 1);
     if (error) return { data: empty, error: unavailable };
     return { data: { items: (data ?? []) as unknown as AudioItem[], total: count ?? 0 }, error: null };
   } catch { return { data: empty, error: unavailable }; }
