@@ -39,9 +39,8 @@ An open-source, audio-only live broadcasting and on-demand audio platform, desig
 12. [Free-tier reality check](#-free-tier-reality-check)
 13. [Security](#-security)
 14. [Known limitations and roadmap](#-known-limitations-and-roadmap)
-15. [How this project was built](#-how-this-project-was-built)
-16. [Documentation index](#-documentation-index)
-17. [Contributing](#-contributing) · [License](#-license) · [Acknowledgements](#-acknowledgements)
+15. [Documentation index](#-documentation-index)
+16. [Contributing](#-contributing) · [License](#-license) · [Acknowledgements](#-acknowledgements)
 
 ---
 
@@ -211,7 +210,7 @@ See [`docs/DATABASE_SCHEMA.md`](docs/DATABASE_SCHEMA.md).
 
 ## 🚀 Deploy your own
 
-Everything below can be done **from a phone browser**. You need: a GitHub account, a Supabase account, a Vercel account, and later a LiveKit account and a Dropbox account. **No credit card.** If any service asks for one, stop.
+You need: a GitHub account, a Supabase account, a Vercel account, and later a LiveKit account and a Dropbox account. **No credit card.** If any service asks for one, stop.
 
 > **Which Vercel plan?** Vercel's free **Hobby** plan is for **personal, non-commercial use only**. If you add ads, payments, donations, or run this for a company or client, use a paid Vercel plan or another host.
 
@@ -381,22 +380,6 @@ This was **code-reviewed, not penetration-tested**, and has no automated tests o
 - An always-on server-side duration limit
 - A true audio host in place of Dropbox when traffic grows
 - Higher capacity once a paid LiveKit plan is acceptable
-
----
-
-## 🏗️ How this project was built
-
-LaSW was built in **three phases**, entirely from an **Android phone** with browser dashboards only (no terminal, no local Node.js), working together with **Claude** (an AI assistant) for design and code.
-
-1. **Foundation:** configuration, Supabase clients, schema and RLS, UI kit, public pages, authentication, user dashboard, admin and studio foundations
-2. **Live audio and recording:** LiveKit tokens and rooms, host studio, listener player, raise-hand and moderation, server-side recording, webhook finalization, rate limiting
-3. **Library and archive:** library search and player, personal features, Dropbox archive workflow, system status, review and fixes
-
-Design decisions that shaped it:
-- **Zero-budget first:** every external service is checked against its free plan, and limits are configuration, not assumptions
-- **Honest by design:** no fake features; unavailable metrics are shown as unavailable
-- **Server-enforced security:** the browser is never trusted for permissions
-- **Phone-friendly operations:** every setup step works in Android Chrome
 
 ---
 
