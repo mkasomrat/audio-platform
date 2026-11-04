@@ -69,7 +69,7 @@ export default async function Status() {
       <h1 className="text-3xl font-bold">System status</h1>
       <p className="text-sm text-muted">Each line says how it was obtained: <b>measured</b> now, an <b>estimate</b>, a <b>setting</b>, or <b>unavailable</b>. Nothing here is invented.</p>
       <Card className="space-y-2"><h2 className="font-semibold">Warnings</h2>{warnings.length ? <ul className="list-disc space-y-1 pl-5 text-sm text-danger">{warnings.map((w) => <li key={w}>{w}</li>)}</ul> : <p className="text-sm text-muted">No warnings from the checks above.</p>}</Card>
-      <div className="space-y-2">{rows.map((r) => <Card key={r.label} className="flex flex-wrap items-center justify-between gap-2"><div><p className="text-sm text-muted">{r.label}</p><p className="font-semibold">{r.value}</p></div><Badge tone={tone[r.kind]}>{r.kind}</Badge></Card>)}</div>
+      <div className="space-y-2">{rows.map((r) => <Card key={r.label} className="flex flex-wrap items-center justify-between gap-2"><div className="min-w-0"><p className="text-sm text-muted">{r.label}</p><p className="font-semibold [overflow-wrap:anywhere]">{r.value}</p></div><Badge tone={tone[r.kind]}>{r.kind}</Badge></Card>)}</div>
       <Card><h2 className="mb-1 font-semibold">Known free-tier limits</h2><p className="text-sm text-muted">The 200-listener goal is not available on free plans. See docs/FREE_TIER_LIMITATIONS.md. Never upgrade any account to a paid plan from these warnings.</p></Card>
     </div>
   );
