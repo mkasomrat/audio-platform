@@ -3,7 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Badge, EmptyState } from "@/components/ui/feedback";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/format";
-import { refreshRecording, verifyFormat } from "./actions";
+import { ConfirmForm } from "@/components/forms/confirm-form";
+import { deleteRecording, refreshRecording, verifyFormat } from "./actions";
+
+const warning = (r: { status: string; temp_deleted: boolean; archive_status: string }) =>
+  r.status === "ready" && !r.temp_deleted && r.archive_status !== "verified"
+    ? "This recording has NOT been archived. Deleting it permanently removes the only copy of the audio. This can't be undone."
+    : r.status === "ready" && !r.temp_deleted
+      ? "The temporary file will be permanently removed. The Dropbox copy and its link are not touched."
+      : "The recording record will be removed. This can't be undone.";
 
 const mb = (n: number | null) => (n ? `${(n / 1048576).toFixed(1)} MB` : "unknown");
 const dur = (s: number | null) => (s ? `${Math.floor(s / 60)} min ${s % 60}s` : "unknown");
@@ -30,6 +38,7 @@ export default async function Recordings({ searchParams }: { searchParams: Promi
               {r.status === "ready" && !r.temp_deleted && <>
                 <form action={verifyFormat}><input type="hidden" name="id" value={r.id} /><Button type="submit" variant="secondary" className="min-h-9 px-3">Check real format</Button></form>
                 <Button href={`/api/admin/recordings/${r.id}/download`} variant="secondary" className="min-h-9 px-3">Download</Button></>}
+              {!["recording", "finalizing"].includes(r.status) && <ConfirmForm action={deleteRecording} hidden={{ id: r.id }} buttonLabel="Delete" title="Delete this recording?" description={warning(r)} confirmLabel="Delete recording" />}
             </div>
           </Card>))}</div>}
     </>
