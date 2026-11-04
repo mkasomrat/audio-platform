@@ -43,3 +43,9 @@ export async function pingStorage() {
   const { e, s3 } = client();
   await s3.send(new ListObjectsV2Command({ Bucket: e.bucket, MaxKeys: 1 }));
 }
+
+// Non-secret settings, safe to show to administrators when diagnosing connection problems.
+export function describeStorage() {
+  const e = env();
+  return e ? { endpoint: e.endpoint, region: e.region, bucket: e.bucket } : null;
+}
