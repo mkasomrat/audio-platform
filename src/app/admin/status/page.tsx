@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/feedback";
 import { adminClient } from "@/lib/supabase/admin";
 import { capacity, maxTotalParticipants, PROVIDER_LIMITS } from "@/config/quotas";
 import { listParticipants, listRooms, livekitConfigured } from "@/lib/livekit/server";
-import { pingStorage, storageConfigured } from "@/lib/storage/s3";
+import { describeStorage, pingStorage, storageConfigured } from "@/lib/storage/s3";
 import { estimateMonthlyMinutes } from "@/lib/data/usage";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,19 @@ export default async function Status() {
         if (total >= maxTotalParticipants * 0.9) warnings.push("Participants are above 90% of the configured limit.");
       } catch (e: any) { add("LiveKit", `Unreachable: ${String(e.message ?? e).slice(0, 80)}`, "unavailable"); warnings.push("LiveKit could not be reached. Live audio may be down or the keys are wrong."); }
     } else { add("LiveKit", "Not configured", "unavailable"); warnings.push("LiveKit keys are not set."); }
-    if (storageConfigured()) { try { await pingStorage(); add("Recording storage", "Reachable", "measured"); } catch { add("Recording storage", "Unreachable", "unavailable"); warnings.push("Recording storage could not be reached. New recordings will fail."); } }
+    if (storageConfigured()) {
+      try { await pingStorage(); add("Recording storage", "Reachable", "measured"); }
+      catch (e: any) {
+        const code = e?.$metadata?.httpStatusCode, d = describeStorage();
+        add("Recording storage", `Unreachable: ${e?.name ?? "Error"}${code ? ` (HTTP ${code})` : ""}. ${String(e?.message ?? "").slice(0, 160)}`, "unavailable");
+        if (d) add("Storage settings in use", `endpoint ${d.endpoint} | region ${d.region} | bucket ${d.bucket}`, "setting");
+        if (d && /supabase/i.test(d.endpoint) && !/\/storage\/v1\/s3\/?$/.test(d.endpoint)) warnings.push("The storage endpoint should end with /storage/v1/s3.");
+        if (d && d.region === "auto" && /supabase/i.test(d.endpoint)) warnings.push("STORAGE_REGION is 'auto' or unset. Supabase needs its real region code (for example ap-southeast-1).");
+        if (code === 403) warnings.push("HTTP 403: the access key ID or secret is wrong, or the region does not match.");
+        if (code === 404 || e?.name === "NoSuchBucket") warnings.push("The bucket name was not found. Check R2_BUCKET_NAME and that the bucket exists.");
+        warnings.push("Recording storage could not be reached. New recordings will fail.");
+      }
+    }
     else { add("Recording storage", "Not configured", "unavailable"); warnings.push("Recording storage is not configured. Shows will not be recorded."); }
     const { data: recs } = await db.from("recordings").select("status,archive_status,file_size_bytes,temp_deleted");
     const by = (f: (r: any) => boolean) => (recs ?? []).filter(f).length;
