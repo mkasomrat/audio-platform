@@ -26,10 +26,10 @@ export function Countdown({ startsAt, title }: { startsAt: string; title: string
   const over = left !== null && left <= 0;
   const soon = left !== null && left > 0 && left < 3600_000;
   const parts = left === null || over ? null : [
-    { v: Math.floor(left / 86400000), en: "Days", bn: "দিন" },
-    { v: Math.floor((left % 86400000) / 3600000), en: "Hours", bn: "ঘণ্টা" },
-    { v: Math.floor((left % 3600000) / 60000), en: "Minutes", bn: "মিনিট" },
-    { v: Math.floor((left % 60000) / 1000), en: "Seconds", bn: "সেকেন্ড" },
+    { v: Math.floor(left / 86400000), en: "Days" },
+    { v: Math.floor((left % 86400000) / 3600000), en: "Hours" },
+    { v: Math.floor((left % 3600000) / 60000), en: "Minutes" },
+    { v: Math.floor((left % 60000) / 1000), en: "Seconds" },
   ];
   let when = "", zone = "";
   if (now !== null) {
@@ -46,24 +46,23 @@ export function Countdown({ startsAt, title }: { startsAt: string; title: string
           <span className={`relative inline-flex size-3 rounded-full ${over ? "bg-live" : "bg-brand"}`} />
         </span>
         <p className="font-display text-sm font-bold uppercase tracking-wide text-muted">
-          {over ? "Starting any moment · এখনই শুরু হবে" : soon ? "Starting soon · শুরু হতে আর একটু বাকি" : "Starts in · শুরু হতে বাকি"}
+          {over ? "Starting any moment" : soon ? "Starting soon" : "Starts in"}
         </p>
       </div>
 
       {over ? (
         <p role="status" className="font-display text-2xl font-extrabold leading-snug">
           The start time has arrived. Waiting for the host to go live&hellip;
-          <span className="mt-1 block text-base font-semibold text-muted">সময় হয়েছে, হোস্ট শুরু করলেই এখানে জয়েন বোতাম আসবে।</span>
         </p>
       ) : (
         <>
           <div role="timer" aria-live="off" aria-label={now === null ? "Loading countdown" : `${minutesLeft} minutes until the show`} className="grid grid-cols-4 gap-2 sm:gap-3">
-            {(parts ?? [{ en: "Days", bn: "দিন" }, { en: "Hours", bn: "ঘণ্টা" }, { en: "Minutes", bn: "মিনিট" }, { en: "Seconds", bn: "সেকেন্ড" }]).map((p, i) => (
+            {(parts ?? [{ en: "Days" }, { en: "Hours" }, { en: "Minutes" }, { en: "Seconds" }]).map((p, i) => (
               <div key={p.en} className="rounded-xl border border-line bg-bg/80 px-1 py-3 text-center sm:py-4">
                 <div className={`font-display text-3xl font-extrabold tabular-nums leading-none sm:text-5xl ${i === 3 ? "text-brand" : ""}`}>
                   {parts && "v" in p ? pad((p as { v: number }).v) : "--"}
                 </div>
-                <div className="mt-2 text-[11px] font-semibold leading-tight text-muted sm:text-xs">{p.en}<span className="block">{p.bn}</span></div>
+                <div className="mt-2 text-[11px] font-semibold leading-tight text-muted sm:text-xs">{p.en}</div>
               </div>
             ))}
           </div>
