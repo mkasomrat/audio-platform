@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Badge, ErrorState, LiveBadge } from "@/components/ui/feedback";
 import { Card } from "@/components/ui/card";
 import { getBroadcast } from "@/lib/data/broadcasts";
+import { Countdown } from "@/components/broadcasts/countdown";
 import { ListenerPlayer } from "@/components/live/listener-player";
 import { formatDateTime } from "@/lib/format";
 
@@ -29,6 +30,7 @@ export default async function BroadcastPage({ params }: Props) {
       <h1 className="text-4xl font-extrabold leading-tight">{b.title}</h1>
       <p className="text-muted">{b.hosts.length ? `Hosted by ${b.hosts.join(", ")} · ` : ""}{formatDateTime(b.scheduled_at ?? b.started_at)}</p>
       {b.description && <p className="whitespace-pre-line text-lg">{b.description}</p>}
+      {b.status === "scheduled" && b.scheduled_at && <Countdown startsAt={b.scheduled_at} title={b.title} />}
       {b.status === "live" || b.status === "scheduled" ? <ListenerPlayer broadcastId={b.id} initialStatus={b.status} /> : <Card><p className="text-sm text-muted">{note}</p></Card>}
     </article>
   );
