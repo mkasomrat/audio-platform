@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CalendarClock, History, Info, Library, Mic, Radio, ShieldCheck, type LucideIcon } from "lucide-react";
 import { Logo } from "./logo";
 import { MobileMenu, type MenuGroup } from "./mobile-menu";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -7,12 +8,12 @@ import { getSessionWithRoles, type RoleKey } from "@/lib/auth/roles";
 import { getBrandName } from "@/lib/data/settings";
 
 const VERSION = "0.1.0";
-const nav = [
-  { href: "/broadcasts/live", label: "Live" },
-  { href: "/broadcasts/upcoming", label: "Upcoming" },
-  { href: "/broadcasts/completed", label: "Past shows" },
-  { href: "/library", label: "Library" },
-  { href: "/about", label: "About" },
+const nav: { href: string; label: string; Icon: LucideIcon }[] = [
+  { href: "/broadcasts/live", label: "Live", Icon: Radio },
+  { href: "/broadcasts/upcoming", label: "Upcoming", Icon: CalendarClock },
+  { href: "/broadcasts/completed", label: "Past shows", Icon: History },
+  { href: "/library", label: "Library", Icon: Library },
+  { href: "/about", label: "About", Icon: Info },
 ];
 
 export async function SiteHeader() {
@@ -24,24 +25,24 @@ export async function SiteHeader() {
   const isAdmin = roles.includes("admin") || roles.includes("super_admin");
   const canStudio = isAdmin || roles.includes("broadcaster") || roles.includes("moderator");
 
-  const desktop = [...nav, ...(canStudio ? [{ href: "/studio", label: "Studio" }] : []), ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : [])];
+  const desktop = [...nav, ...(canStudio ? [{ href: "/studio", label: "Studio", Icon: Mic }] : []), ...(isAdmin ? [{ href: "/admin", label: "Admin", Icon: ShieldCheck }] : [])];
   const groups: MenuGroup[] = [
-    { id: "listen", label: "Listen", bn: "শুনুন", items: [
-      { href: "/broadcasts/live", label: "Live now", bn: "লাইভ" },
-      { href: "/broadcasts/upcoming", label: "Upcoming", bn: "আসন্ন শো" },
-      { href: "/broadcasts/completed", label: "Past shows", bn: "পূর্বের শো" }] },
-    { id: "library", label: "Library", bn: "লাইব্রেরি", href: "/library" },
-    { id: "about", label: "About", bn: "সম্পর্কে", href: "/about" },
+    { id: "listen", label: "Listen", icon: "headphones", items: [
+      { href: "/broadcasts/live", label: "Live now", icon: "radio" },
+      { href: "/broadcasts/upcoming", label: "Upcoming", icon: "upcoming" },
+      { href: "/broadcasts/completed", label: "Past shows", icon: "history" }] },
+    { id: "library", label: "Library", icon: "library", href: "/library" },
+    { id: "about", label: "About", icon: "info", href: "/about" },
     signedIn
-      ? { id: "account", label: "Account", bn: "অ্যাকাউন্ট", items: [
-          { href: "/dashboard", label: "Dashboard", bn: "ড্যাশবোর্ড" },
-          { href: "/dashboard/listening", label: "My listening", bn: "আমার শোনা" },
-          { href: "/dashboard/playlists", label: "Playlists", bn: "প্লেলিস্ট" },
-          ...(canStudio ? [{ href: "/studio", label: "Studio", bn: "স্টুডিও" }] : []),
-          ...(isAdmin ? [{ href: "/admin", label: "Admin", bn: "অ্যাডমিন" }] : [])] }
-      : { id: "account", label: "Account", bn: "অ্যাকাউন্ট", items: [
-          { href: "/login", label: "Log in", bn: "লগইন" },
-          { href: "/register", label: "Create account", bn: "নতুন অ্যাকাউন্ট" }] },
+      ? { id: "account", label: "Account", icon: "user", items: [
+          { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+          { href: "/dashboard/listening", label: "My listening", icon: "headphones" },
+          { href: "/dashboard/playlists", label: "Playlists", icon: "playlists" },
+          ...(canStudio ? [{ href: "/studio", label: "Studio", icon: "studio" as const }] : []),
+          ...(isAdmin ? [{ href: "/admin", label: "Admin", icon: "admin" as const }] : [])] }
+      : { id: "account", label: "Account", icon: "user", items: [
+          { href: "/login", label: "Log in", icon: "login" },
+          { href: "/register", label: "Create account", icon: "signup" }] },
   ];
 
   return (
@@ -49,7 +50,8 @@ export async function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
         <Logo />
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
-          {desktop.map((n) => <Link key={n.href} href={n.href} className="rounded-lg px-3 py-2 text-sm font-medium text-muted hover:bg-surface hover:text-ink">{n.label}</Link>)}
+          {desktop.map(({ href, label, Icon }) => (
+            <Link key={href} href={href} className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted hover:bg-surface hover:text-ink"><Icon className="size-4" aria-hidden />{label}</Link>))}
         </nav>
         <div className="flex items-center gap-1">
           <ThemeToggle />
