@@ -33,7 +33,7 @@ export function Countdown({ startsAt, title }: { startsAt: string; title: string
   ];
   let when = "", zone = "";
   if (now !== null) {
-    when = new Intl.DateTimeFormat(undefined, { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit" }).format(new Date(target));
+    when = new Intl.DateTimeFormat("en-US", { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit", hour12: true }).format(new Date(target));
     zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   }
   const minutesLeft = left === null || over ? 0 : Math.ceil(left / 60000);
