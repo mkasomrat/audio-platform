@@ -52,7 +52,7 @@ export function Countdown({ startsAt, title }: { startsAt: string; title: string
 
       {over ? (
         <p role="status" className="font-display text-2xl font-extrabold leading-snug">
-          The start time has arrived. Waiting for the host to go live&hellip;
+          The start time has arrived. Waiting for the host to go live. The sound will start automatically.
         </p>
       ) : (
         <>
