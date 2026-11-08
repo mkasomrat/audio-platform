@@ -15,6 +15,7 @@ export function useLiveRoom() {
   const [micOn, setMicOn] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [audioBlocked, setAudioBlocked] = useState(false);
 
   const recount = useCallback((r: Room) => setListeners([...r.remoteParticipants.values()].filter((p) => !p.permissions?.canPublish).length), []);
 
@@ -22,7 +23,7 @@ export function useLiveRoom() {
     const r = roomRef.current; roomRef.current = null;
     if (r) await r.disconnect();
     audioBox.current?.replaceChildren();
-    setConn("idle"); setMicOn(false); setCanSpeak(false); setQuality("unknown");
+    setConn("idle"); setMicOn(false); setCanSpeak(false); setQuality("unknown"); setAudioBlocked(false);
   }, []);
 
   const connect = useCallback(async (url: string, token: string, publish: boolean) => {
@@ -40,10 +41,12 @@ export function useLiveRoom() {
     room.on(RoomEvent.ParticipantDisconnected, () => recount(room));
     room.on(RoomEvent.ParticipantPermissionsChanged, (_prev, p) => { if (p.isLocal) { const can = Boolean(p.permissions?.canPublish); setCanSpeak(can); if (!can) setMicOn(false); } recount(room); });
     room.on(RoomEvent.TrackMuted, (_pub, p) => { if (p.isLocal) setMicOn(false); });
+    room.on(RoomEvent.AudioPlaybackStatusChanged, () => setAudioBlocked(!room.canPlaybackAudio));
     room.on(RoomEvent.Disconnected, () => { setConn("disconnected"); setMicOn(false); });
     try {
       await room.connect(url, token);
       await room.startAudio().catch(() => {});
+      setAudioBlocked(!room.canPlaybackAudio);
       setConn("connected"); recount(room); setCanSpeak(publish);
       if (publish) { await room.localParticipant.setMicrophoneEnabled(true); setMicOn(true); }
     } catch (e: any) {
@@ -64,6 +67,16 @@ export function useLiveRoom() {
   const loadDevices = useCallback(async () => { try { setDevices(await Room.getLocalDevices("audioinput")); } catch { setDevices([]); } }, []);
   const pickDevice = useCallback(async (id: string) => { try { await roomRef.current?.switchActiveDevice("audioinput", id); } catch { setError("Couldn't switch microphone."); } }, []);
 
+  // Browsers only allow sound after a touch. While blocked, ANY tap, key press or click anywhere on the page unlocks it.
+  const unlockAudio = useCallback(async () => { try { await roomRef.current?.startAudio(); } catch {} setAudioBlocked(!(roomRef.current?.canPlaybackAudio ?? false)); }, []);
+  useEffect(() => {
+    if (!audioBlocked) return;
+    const handler = () => { void unlockAudio(); };
+    const events = ["pointerup", "click", "keydown", "touchend"];
+    events.forEach((e) => window.addEventListener(e, handler));
+    return () => events.forEach((e) => window.removeEventListener(e, handler));
+  }, [audioBlocked, unlockAudio]);
+
   useEffect(() => () => { roomRef.current?.disconnect(); }, []);
-  return { audioBox, conn, quality, listeners, canSpeak, micOn, error, devices, connect, disconnect, toggleMic, setVolume, setMuted, loadDevices, pickDevice };
+  return { audioBlocked, unlockAudio, audioBox, conn, quality, listeners, canSpeak, micOn, error, devices, connect, disconnect, toggleMic, setVolume, setMuted, loadDevices, pickDevice };
 }
