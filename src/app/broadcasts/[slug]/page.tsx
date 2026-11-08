@@ -31,7 +31,7 @@ export default async function BroadcastPage({ params }: Props) {
       <p className="text-muted">{b.hosts.length ? `Hosted by ${b.hosts.join(", ")} · ` : ""}{formatDateTime(b.scheduled_at ?? b.started_at)}</p>
       {b.description && <p className="whitespace-pre-line text-lg">{b.description}</p>}
       {b.status === "scheduled" && b.scheduled_at && <Countdown startsAt={b.scheduled_at} title={b.title} />}
-      {b.status === "live" || b.status === "scheduled" ? <ListenerPlayer broadcastId={b.id} initialStatus={b.status} /> : <Card><p className="text-sm text-muted">{note}</p></Card>}
+      {b.status === "live" || b.status === "scheduled" ? <ListenerPlayer broadcastId={b.id} initialStatus={b.status} scheduledAt={b.scheduled_at} /> : <Card><p className="text-sm text-muted">{note}</p></Card>}
     </article>
   );
 }
